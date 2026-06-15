@@ -1,0 +1,21 @@
+{
+  "team": "2A202600915-TranNguyenAnhThu",
+  "phase": "public",
+  "headline": 97.11,
+  "sub": {
+    "correct": 0.9167,
+    "quality": 0.9469,
+    "error": 1.0,
+    "latency": 0.0,
+    "cost": 0.0,
+    "drift": 0.9538,
+    "prompt": 0.8929
+  },
+  "diag_f1": 0.889,
+  "n": 120,
+  "n_correct": 104,
+  "judge_mode": "offline",
+  "weights_hash": "e81a8ed58d93",
+  "key_hash": "9a800fa6968d",
+  "sig": "1d597f9f51930868dba2a3c218127d95fc08bda3317c10bb43bd0974ef8c4837"
+}
