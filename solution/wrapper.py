@@ -45,6 +45,7 @@ except Exception:
 
 
 def mitigate(call_next, question, config, context):
+    import traceback
     qid = context.get("qid", "?")
     turn = context.get("turn_index", 0)
     session = context.get("session_id", "?")
@@ -52,7 +53,13 @@ def mitigate(call_next, question, config, context):
     last_result = None
     for attempt in range(1, 4):
         t0 = time.time()
-        result = call_next(question, config)
+        try:
+            result = call_next(question, config)
+        except Exception as exc:
+            with open("/tmp/obs_err.log", "a") as f:
+                f.write(f"[{qid}] call_next raised: {exc}\n")
+                f.write(traceback.format_exc() + "\n---\n")
+            raise
         wall_ms = int((time.time() - t0) * 1000)
 
         meta = result.get("meta", {})
