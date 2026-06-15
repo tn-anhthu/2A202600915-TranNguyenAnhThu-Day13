@@ -1,12 +1,54 @@
 {
-  "team": "TODO-team-name",
+  "team": "2A202600915-TranNguyenAnhThu",
   "schema_version": 1,
   "findings": [
     {
-      "fault_class": "latency_spike",
-      "evidence": {"metric": "latency_p95_ms", "observed": "TODO from your telemetry", "trace_ids": []},
-      "root_cause": "TODO: what config knob or behavior causes it?",
-      "suggested_fix": "TODO: config change and/or wrapper mitigation"
+      "fault_class": "arithmetic_error",
+      "evidence": {"metric": "temperature", "observed": "config temperature=1.6 causes inconsistent math outputs"},
+      "root_cause": "temperature set to 1.6 makes the LLM sample noisily, producing wrong totals and backwards discounts",
+      "suggested_fix": "set temperature to 0.2 in config.json"
+    },
+    {
+      "fault_class": "infinite_loop",
+      "evidence": {"metric": "status", "observed": "status=max_steps on some requests; loop_guard=false in config"},
+      "root_cause": "loop_guard disabled allows the agent to repeat identical tool calls indefinitely",
+      "suggested_fix": "set loop_guard=true and tool_budget=4 in config.json"
+    },
+    {
+      "fault_class": "error_spike",
+      "evidence": {"metric": "tool_error_rate", "observed": "config tool_error_rate=0.18 injects 18% tool failures"},
+      "root_cause": "tool_error_rate deliberately set to 0.18; retry disabled so every injected failure becomes a hard error",
+      "suggested_fix": "set tool_error_rate=0.0 and retry.enabled=true with max_attempts=3"
+    },
+    {
+      "fault_class": "pii_leak",
+      "evidence": {"metric": "redact_pii", "observed": "config redact_pii=false; agent echoes customer email and phone in answers"},
+      "root_cause": "PII redaction disabled in config and bad prompt did not forbid echoing customer contact data",
+      "suggested_fix": "set redact_pii=true in config.json and add NO PII rule to prompt.txt"
+    },
+    {
+      "fault_class": "tool_failure",
+      "evidence": {"metric": "catalog_override", "observed": "catalog_override sets macbook in_stock=false; normalize_unicode=false causes diacritic city lookups to fail"},
+      "root_cause": "catalog_override injects false stock data; unicode normalization off breaks city name matching",
+      "suggested_fix": "clear catalog_override to {} and set normalize_unicode=true"
+    },
+    {
+      "fault_class": "cost_blowup",
+      "evidence": {"metric": "model_price_tier", "observed": "model_price_tier=premium and cache disabled; token counts far above task need"},
+      "root_cause": "premium tier pricing combined with no caching and verbose_system=true inflates cost per request",
+      "suggested_fix": "set model_price_tier=standard, cache.enabled=true, verbose_system=false"
+    },
+    {
+      "fault_class": "quality_drift",
+      "evidence": {"metric": "session_drift_rate", "observed": "session_drift_rate=0.06 and context_reset_every=0 causes answer quality to degrade across turns"},
+      "root_cause": "drift injected at 6% per turn with no session reset, compounding errors late in session",
+      "suggested_fix": "set session_drift_rate=0.0 and context_reset_every=5"
+    },
+    {
+      "fault_class": "tool_overuse",
+      "evidence": {"metric": "tool_budget", "observed": "tool_budget=0 (unlimited) and bad prompt did not constrain tool calls"},
+      "root_cause": "no tool budget cap allows agent to call the same tool multiple times unnecessarily",
+      "suggested_fix": "set tool_budget=4 and add 'each tool at most once' rule to prompt.txt"
     }
   ]
 }
