@@ -89,8 +89,15 @@ def mitigate(call_next, question, config, context):
         if answer and pii_count > 0:
             result = dict(result)
             result["answer"] = clean_answer
+            answer = clean_answer
 
         last_result = result
+
+        # retry if answer contains raw XML tool call syntax (DeepSeek bleed-through)
+        if answer and "<｜DSML｜" in answer:
+            logger.log_event("RETRY", {"qid": qid, "attempt": attempt, "reason": "dsml_xml_bleed"})
+            if attempt < 3:
+                continue
 
         if status == "ok" or attempt == 3:
             break

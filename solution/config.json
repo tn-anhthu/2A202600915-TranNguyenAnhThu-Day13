@@ -8,7 +8,7 @@
   "context_size": 16,
   "verbose_system": false,
   "timeout_ms": 30000,
-  "max_completion_tokens": 512,
+  "max_completion_tokens": 1024,
   "retry": {"enabled": true, "max_attempts": 3, "backoff_ms": 500},
   "cache": {"enabled": true},
   "normalize_unicode": true,
